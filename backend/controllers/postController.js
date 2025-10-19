@@ -61,3 +61,29 @@ export const getPosts = async (req, res) => {
         return res.status(500).json({ message: 'Server error while fetching posts' });
     }
 }
+
+//fn to like / unlike
+export const likeUnlikePost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+
+        if(!post) {
+            return res.status(404).json({
+                message: 'Post not found'
+            });
+        }
+        const isLiked = post.likes.includes(req.user.id);
+        if(isLiked) {
+            post.likes.pull(req.user.id);
+        }
+        else post.likes.push(req.user.id);
+
+        await post.save();
+        return res.status(200).json(post.likes);
+    } catch (error) {
+        console.log("this is error postController/likeUnlikePost: ", error);
+        return res.status(500).json({
+            message: `Internal Server Error: ${error.message}`
+        })
+    }
+}

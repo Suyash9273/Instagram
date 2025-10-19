@@ -21,13 +21,24 @@ const getPosts = async (token) => {
     }
 
     const response = await axios.get(API_URL, config);
-    console.log(response);
     return response.data;
+}
+
+const likeUnlikePost = async (postId, token) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+
+    const response = await axios.put(`${API_URL}${postId}/like`, null, config);
+    return response.data; 
 }
 
 const postService = {
     createPost,
-    getPosts
+    getPosts,
+    likeUnlikePost
 }
 
 export default postService;
