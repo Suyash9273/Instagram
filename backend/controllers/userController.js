@@ -1,9 +1,10 @@
 import User from '../models/User.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import Post from '../models/Post.js'
 
 export const registerUser = async (req, res) => {
-    const {username, email, password, fullname} = req.body;
+    const {username, email, password, fullName} = req.body;
 
     try {
         // 1. check if user already exists 
@@ -20,17 +21,18 @@ export const registerUser = async (req, res) => {
             username: username,
             email: email,
             password: hash,
-            fullname: fullname,
+            fullname: fullName,
         });
+        console.log("hello1")
         await newUser.save();
-
+        console.log("hello2")
         return res.status(200).json({
             message: "user registered successfully",
             user: newUser
         });
 
     } catch (error) {
-        return res.status(200).json({
+        return res.status(500).json({
             message: "Server Error",
             error: error.message
         });
@@ -70,16 +72,31 @@ export const loginUser = async (req, res) => {
     }
 }
 
-//Day-> 5 :
+//Day-> 15 :
+// @desc    Get user profile and their posts
+// @route   GET /api/users/profile/:username
 export const getUserProfile = async (req, res) => {
-    //user is inside req object becz middleware protect ran first 
-    if(req.user) {
-        return res.json({
-            _id: req.user._id,
-            username: req.user.username,
-            email: req.user.email
+    try {
+        console.log("hello1");
+        const user = await User.findOne({username: req.params.username}).select('-password');
+        console.log("hello2");
+
+        if(!user) {
+            return res.status(404).json({
+                message: "User not found (inside getUserProfile in userController)"
+            });
+        }
+
+        const posts = await Post.find({user: user._id}).sort({createdAt: -1});
+
+        return res.status(200).json({
+            user: user,
+            posts: posts
+        })
+    } catch (error) {
+        console.log("Error inside : userController-> getUserProfile: ", error);
+        return res.status(500).json({
+            message: "Internal server error"
         });
-    } else {
-        res.status(404).json({message: "User not found"});
     }
 }

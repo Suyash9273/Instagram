@@ -7,5 +7,6 @@ const router = express.Router();
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 
-router.get('/profile', protect, getUserProfile); // Day-5
+router.get('/profile/:username', protect, getUserProfile); // Day -> 15
+
 export default router;
