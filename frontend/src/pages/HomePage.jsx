@@ -10,6 +10,12 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const { currentUser } = useContext(AuthContext);
 
+  const handlePostDeleted = (deletedPostId) => {
+        setPosts(currentPosts =>
+            currentPosts.filter(post => post._id !== deletedPostId)
+        );
+    };
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -36,7 +42,10 @@ const HomePage = () => {
               <p>Loading posts...</p>
             ) : posts.length > 0 ? (
               posts.map((post) => {
-                return <Post key={post._id} post={post} />
+                return <Post
+                  key={post._id}
+                  post={post}
+                  onPostDeleted={handlePostDeleted} />
               })
             ) : (<p>No posts found...</p>)
           }

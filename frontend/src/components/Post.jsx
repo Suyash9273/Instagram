@@ -3,12 +3,35 @@ import { useState, useContext } from 'react';
 import {AuthContext} from '../context/AuthContext'
 import postService from '../services/postService'
 import { BiLike } from "react-icons/bi";
+import { MdDelete } from "react-icons/md";
 
-const Post = ({ post }) => {
+const Post = ({ post, onPostDeleted }) => {
     const {currentUser} = useContext(AuthContext);
     // state to manage likes for instant ui feedback
     const [likes, setLikes] = useState(post.likes);
     const [isLiked, setIsLiked] = useState(post.likes.includes(currentUser._id));
+    
+    //states to manage comments : -> 
+    const [comments, setComments] = useState(post.comments);
+    const [newComment, setNewComment] = useState('');
+
+    const handleCommentSubmit = async (e) => {
+        e.preventDefault();
+        if(!newComment.trim()) return; // don't submit empty comments
+
+        try {
+            const updatedComments = await postService.addComment(
+                post._id,
+                {text: newComment},
+                currentUser.token
+            )
+            setComments(updatedComments);
+            setNewComment('');// clear the input field
+        } catch (error) {
+            console.log("error while putting comment: -> ", error);
+            return;
+        }
+    }
 
     const handleLike = async () => {
         if (!currentUser || !currentUser.token) {
@@ -35,10 +58,23 @@ const Post = ({ post }) => {
         }
     }
 
+    //handler for deleting a post : -> 
+    const handleDelete = async () => {
+        if(window.confirm("Are you sure you want to delete this Post?")) {
+            try {
+                await postService.deletePost(post._id, currentUser.token);
+                onPostDeleted(post._id);// Call the function from the parent
+            } catch (error) {
+                console.log("Failed to delete post: -> (inside Post.jsx handleDelete) ", error);
+                return;
+            }
+        }
+    }
+
     return (
         <div className="bg-white border border-gray-300 rounded-lg mb-6">
             {/* Post Header */}
-            <div className="p-4 flex items-center">
+            <div className="p-4 flex items-center justify-between">
                 <img
                     // We will add real profile pictures later
                     src="https://via.placeholder.com/32"
@@ -46,6 +82,10 @@ const Post = ({ post }) => {
                     className="w-8 h-8 rounded-full mr-3"
                 />
                 <span className="font-semibold text-sm">{post.user.username}</span>
+                {/* --- CONDITIONAL RENDERING FOR DELETE ICON --- */}
+                {currentUser && currentUser._id === post.user._id && (
+                    <MdDelete onClick={handleDelete}/>
+                )}
             </div>
 
             {/* Post Image */}
@@ -63,6 +103,40 @@ const Post = ({ post }) => {
                     <span className="font-semibold text-sm mr-2">{post.user.username}</span>
                     <span className="text-sm">{post.caption}</span>
                 </div>
+
+                {/* --- COMMENTS SECTION --- */}
+                <div className="text-sm text-gray-500 mb-2">
+                    {/* We can add a link to a "view all" page later */}
+                    {comments.length > 0 && `View all ${comments.length} comments`}
+                </div>
+
+                <div className="space-y-1">
+                    {comments.slice(0, 2).map((comment) => ( // Show the first 2 comments
+                        <div key={comment._id} className="text-sm">
+                            <span className="font-semibold mr-2">{comment.user.username}</span>
+                            <span>{comment.text}</span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* --- ADD COMMENT FORM --- */}
+                <form onSubmit={handleCommentSubmit} className="flex items-center mt-3 border-t pt-3">
+                    <input
+                        type="text"
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Add a comment..."
+                        className="flex-grow bg-transparent outline-none text-sm"
+                    />
+                    <button
+                        type="submit"
+                        disabled={!newComment.trim()}
+                        className="text-blue-500 font-semibold text-sm disabled:text-blue-200"
+                    >
+                        Post
+                    </button>
+                </form>
+                
             </div>
 
         </div>

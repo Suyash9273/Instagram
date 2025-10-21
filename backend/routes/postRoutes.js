@@ -1,5 +1,5 @@
 import express from 'express';
-import {createPost, getPosts, likeUnlikePost} from '../controllers/postController.js';
+import {createPost, getPosts, likeUnlikePost, addComment, deletePost} from '../controllers/postController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import multer from 'multer';
 
@@ -13,5 +13,8 @@ const router = express.Router();
 router.post('/', protect, upload.single('image'), createPost);// to upload a post
 router.get('/', protect, getPosts); // to fetch posts
 router.put('/:id/like', protect, likeUnlikePost);
+
+router.post('/:id/comments', protect, addComment); // <-- ADD comment
+router.delete('/:id', protect, deletePost); // <-- DELETE post
 
 export default router;

@@ -60,7 +60,7 @@ export const loginUser = async (req, res) => {
             email: user.email,
             username: user.username,
             token: token
-        });
+        });      
 
     } catch (error) {
         return res.status(404).json({
