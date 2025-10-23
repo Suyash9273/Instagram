@@ -6,7 +6,7 @@ import authService from '../services/authService';
 
 const LoginPage = () => {
     const navigate = useNavigate();
-    const {setCurrentUser} = useContext(AuthContext);
+    const { setCurrentUser } = useContext(AuthContext);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -32,19 +32,24 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="flex justify-center items-center h-screen bg-slate-900">
-            <div className="bg-white border border-gray-300 p-10 w-full max-w-sm rounded-lg shadow-md">
-                <form className="flex flex-col gap-4" onSubmit={onSubmit}>
-                    <h2 className="text-2xl font-semibold text-center mb-4">
-                        Log In to Insta-Clone
-                    </h2>
+        <div className="flex justify-center items-center h-screen bg-gradient-to-b from-gray-200 to-gray-400 
+                shadow-lg">
+            <div className='flex flex-col items-center justify-center w-[656px] h-[594px] gap-[151px] px-[135px] py-[34px] rounded-4xl bg-[#5E5959]'>
+                <form className="flex flex-col items-center justify-center w-full max-w-[450px] gap-11" onSubmit={onSubmit}>
+
+                    <div className='flex justify-center items-center gap-2.5 px-[55px] py-[9px]
+        rounded-4xl bg-black text-[24px] font-extrabold
+        text-[#E055FF]'>
+                        Login-Page
+                    </div>
+
                     <input
                         type="email"
                         name="email"
                         value={email}
                         onChange={onChange}
                         placeholder="Email"
-                        className="p-2 bg-gray-50 border border-gray-300 rounded-md text-sm"
+                        className="flex justify-start w-full gap-2.5 px-4 py-[7px] bg-[#D9D9D9]"
                         required
                     />
                     <input
@@ -53,22 +58,27 @@ const LoginPage = () => {
                         value={password}
                         onChange={onChange}
                         placeholder="Password"
-                        className="p-2 bg-gray-50 border border-gray-300 rounded-md text-sm"
+                        className="flex justify-start w-full gap-2.5 px-4 py-[7px] bg-[#D9D9D9]"
                         required
                     />
-                    <button
-                        type="submit"
-                        className="p-2 mt-2 bg-blue-500 text-white font-bold rounded-md hover:bg-blue-600"
-                    >
-                        Log In
-                    </button>
+
+                    <button type='submit' className='flex justify-center items-center gap-2.5 px-5 py-2 rounded-4xl bg-[#0DE7FF] font-extrabold text-[20px] text-black hover:bg-blue-600 transition'>Login</button>
                 </form>
-                 <p className="text-center text-sm mt-6">
+
+                {/* <p className="text-center text-sm mt-6">
                     Don't have an account?{' '}
                     <Link to="/register" className="text-blue-500 font-bold">
                         Sign Up
                     </Link>
-                </p>
+                </p> */}
+
+                <div className='flex justify-center items-center gap-2.5 px-[31px] py-7 rounded-[40px] bg-[#E35555] font-extrabold text-[20px]'>
+                    <p className='text-black'>Not Registered?  {"->"}</p>
+                    <Link to="/register" className='text-[#FFF41F] hover:text-black transition'>
+                        {"    "} Sign Up
+                    </Link>
+                </div>
+
             </div>
         </div>
     );
