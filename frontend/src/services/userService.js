@@ -12,8 +12,21 @@ const getUserProfile = async (username, token) => {
     return response.data;
 }
 
+//follow or unfollow service: ->
+const followToggle = async (userId, token) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+
+    const response = await axios.put(`${API_URL}follow/${userId}`, null, config);
+    return response.data;
+}
+
 const userService = {
-    getUserProfile
+    getUserProfile,
+    followToggle
 };
 
 export default userService;

@@ -77,9 +77,7 @@ export const loginUser = async (req, res) => {
 // @route   GET /api/users/profile/:username
 export const getUserProfile = async (req, res) => {
     try {
-        console.log("hello1");
         const user = await User.findOne({username: req.params.username}).select('-password');
-        console.log("hello2");
 
         if(!user) {
             return res.status(404).json({
@@ -98,5 +96,57 @@ export const getUserProfile = async (req, res) => {
         return res.status(500).json({
             message: "Internal server error"
         });
+    }
+}
+
+//Day-> 16: 
+export const followToggle = async (req, res) => {
+    try {
+        const targetUserId = req.params.id;//id of user we want to follow/unfollow
+
+        const currentUserId = req.user.id
+
+        //1.A user cannot follow itself
+        if(targetUserId === currentUserId) {
+            res.status(400).json({
+                message: "You cannot follow yourself"
+            })
+        }
+
+        //2.Find both users: 
+        const targetUser = await User.findById(targetUserId);
+        const currentUser = await User.findById(currentUserId);
+
+        if(!targetUser || !currentUser) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+
+        // 3. Check if the current user is already following the target user: 
+        const isFollowing = targetUser.followers.includes(currentUserId);
+
+        if(isFollowing) {
+            // --unfollow--
+            // Remove current user from target's followers array
+            targetUser.followers.pull(targetUser);
+            //Remove target user from current user's following
+            currentUser.following.pull(targetUserId);
+        } else {
+            //--- Follow ----
+            // Add current user to target's followers
+            targetUser.followers.push(currentUserId);
+            currentUser.followers.push(targetUserId);
+
+        }
+        // Save both updated users in document 
+        await targetUser.save();
+        await currentUser.save();
+
+        res.status(200).json({ message: isFollowing ? 'User unfollowed' : 'User followed' });
+
+    } catch (error) {
+        console.error("Follow/Unfollow Error:", error);
+        res.status(500).json({ message: 'Server Error' });
     }
 }
